@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeIndex</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              200: '#bfdbfe',
+              300: '#93c5fd',
+              400: '#60a5fa',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .card-hover { transition: all 0.2s ease; }
+    .card-hover:hover { transform: translateY(-2px); }
+    .icon-option.selected { ring: 2px; --tw-ring-color: rgb(59 130 246); background-color: rgb(239 246 255); }
+    .dark .icon-option.selected { background-color: rgb(30 58 138); }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-300">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-primary-600 flex items-center justify-center text-white">
+          <i class="fa-solid fa-house"></i>
+        </div>
+        <h1 class="text-xl font-bold tracking-tight">HomeIndex</h1>
+      </div>
+      <div class="flex items-center gap-3">
+        <button id="themeToggle" class="p-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" aria-label="Toggle theme">
+          <i class="fa-solid fa-moon dark:hidden"></i>
+          <i class="fa-solid fa-sun hidden dark:block text-yellow-400"></i>
+        </button>
+        <button id="addBtn" class="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors shadow-sm">
+          <i class="fa-solid fa-plus text-sm"></i>
+          <span>Add Link</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Empty State -->
+    <div id="emptyState" class="hidden flex-col items-center justify-center py-20 text-center">
+      <div class="w-20 h-20 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
+        <i class="fa-solid fa-link text-3xl text-gray-400"></i>
+      </div>
+      <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-1">No links yet</h2>
+      <p class="text-gray-500 dark:text-gray-400 max-w-sm">Add your first local service link to get started. Anyone on your network can access this page.</p>
+    </div>
+
+    <!-- Links Grid -->
+    <div id="linksGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <!-- Links will be rendered here -->
+    </div>
+  </main>
+
+  <!-- Add Link Modal -->
+  <div id="modal" class="hidden fixed inset-0 z-50">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="modalOverlay"></div>
+    <div class="relative min-h-screen flex items-center justify-center p-4">
+      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md border border-gray-200 dark:border-gray-700 transform transition-all scale-100">
+        <div class="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700">
+          <h3 class="text-lg font-semibold">Add New Link</h3>
+          <button id="closeModal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
+            <i class="fa-solid fa-xmark text-xl"></i>
+          </button>
+        </div>
+        <form id="addForm" class="p-6 space-y-4">
+          <div>
+            <label class="block text-sm font-medium mb-1.5 text-gray-700 dark:text-gray-300">URL or Address</label>
+            <input type="text" id="urlInput" placeholder="e.g. 192.168.1.100:8080 or http://nas.local" 
+              class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all" required>
+            <p class="mt-1 text-xs text-gray-500">IP, hostname, or full URL are all fine</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1.5 text-gray-700 dark:text-gray-300">Nickname</label>
+            <input type="text" id="nameInput" placeholder="e.g. Home NAS" 
+              class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all" required>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Icon</label>
+            <div class="grid grid-cols-6 gap-2" id="iconGrid">
+              <!-- Icons rendered by JS -->
+            </div>
+          </div>
+          <div class="pt-2 flex gap-3">
+            <button type="button" id="cancelBtn" class="flex-1 px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">Cancel</button>
+            <button type="submit" class="flex-1 px-4 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors shadow-sm">Add Link</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Icons ---
+    const ICONS = [
+      'fa-house', 'fa-server', 'fa-database', 'fa-globe', 'fa-code',
+      'fa-desktop', 'fa-laptop', 'fa-wifi', 'fa-camera', 'fa-print',
+      'fa-hard-drive', 'fa-shield-halved', 'fa-key', 'fa-folder-open',
+      'fa-gamepad', 'fa-music', 'fa-video', 'fa-image', 'fa-file',
+      'fa-chart-line', 'fa-gear', 'fa-terminal', 'fa-network-wired',
+      'fa-router', 'fa-cloud', 'fa-box-archive', 'fa-book',
+      'fa-calendar', 'fa-envelope', 'fa-message'
+    ];
+
+    let selectedIcon = 'fa-globe';
+    let links = [];
+
+    // --- Theme ---
+    const html = document.documentElement;
+    const themeToggle = document.getElementById('themeToggle');
+
+    function initTheme() {
+      const saved = localStorage.getItem('theme');
+      if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        html.classList.add('dark');
+        html.classList.remove('light');
+      } else {
+        html.classList.add('light');
+        html.classList.remove('dark');
+      }
+    }
+
+    themeToggle.addEventListener('click', () => {
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        html.classList.add('light');
+        localStorage.setItem('theme', 'light');
+      } else {
+        html.classList.add('dark');
+        html.classList.remove('light');
+        localStorage.setItem('theme', 'dark');
+      }
+    });
+
+    // --- API ---
+    async function fetchLinks() {
+      const res = await fetch('/api/links');
+      links = await res.json();
+      render();
+    }
+
+    async function addLink(link) {
+      const res = await fetch('/api/links', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(link)
+      });
+      if (!res.ok) throw new Error('Failed to add');
+      return res.json();
+    }
+
+    async function deleteLink(id) {
+      const res = await fetch(`/api/links/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to delete');
+    }
+
+    // --- UI ---
+    const grid = document.getElementById('linksGrid');
+    const emptyState = document.getElementById('emptyState');
+    const modal = document.getElementById('modal');
+    const addBtn = document.getElementById('addBtn');
+    const closeModal = document.getElementById('closeModal');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const addForm = document.getElementById('addForm');
+    const urlInput = document.getElementById('urlInput');
+    const nameInput = document.getElementById('nameInput');
+    const iconGrid = document.getElementById('iconGrid');
+
+    function renderIconGrid() {
+      iconGrid.innerHTML = ICONS.map(icon => `
+        <button type="button" data-icon="${icon}" 
+          class="icon-option w-10 h-10 rounded-lg border border-gray-200 dark:border-gray-600 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${icon === selectedIcon ? 'selected' : ''}">
+          <i class="fa-solid ${icon} text-gray-600 dark:text-gray-300"></i>
+        </button>
+      `).join('');
+
+      iconGrid.querySelectorAll('.icon-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+          selectedIcon = btn.dataset.icon;
+          renderIconGrid();
+        });
+      });
+    }
+
+    function getFavicon(url) {
+      try {
+        const u = new URL(url);
+        return `https://www.google.com/s2/favicons?domain=${u.hostname}&sz=64`;
+      } catch {
+        return null;
+      }
+    }
+
+    function render() {
+      if (links.length === 0) {
+        grid.classList.add('hidden');
+        emptyState.classList.remove('hidden');
+        emptyState.classList.add('flex');
+        return;
+      }
+
+      grid.classList.remove('hidden');
+      emptyState.classList.add('hidden');
+      emptyState.classList.remove('flex');
+
+      grid.innerHTML = links.map(link => `
+        <div class="card-hover group relative bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 shadow-sm hover:shadow-md dark:hover:shadow-lg dark:hover:shadow-black/20 cursor-pointer transition-all"
+          onclick="window.open('${link.url}', '_blank')">
+          <button onclick="event.stopPropagation(); removeLink('${link.id}')"
+            class="absolute top-3 right-3 w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 opacity-0 group-hover:opacity-100 transition-all"
+            title="Delete">
+            <i class="fa-solid fa-trash-can text-sm"></i>
+          </button>
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-xl bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid ${link.icon} text-xl text-primary-600 dark:text-primary-400"></i>
+            </div>
+            <div class="min-w-0 flex-1 pt-0.5">
+              <h3 class="font-semibold text-gray-900 dark:text-gray-100 truncate">${escapeHtml(link.name)}</h3>
+              <p class="text-sm text-gray-500 dark:text-gray-400 truncate mt-0.5">${escapeHtml(link.url.replace(/^https?:\/\//, ''))}</p>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    async function removeLink(id) {
+      if (!confirm('Delete this link?')) return;
+      await deleteLink(id);
+      links = links.filter(l => l.id !== id);
+      render();
+    }
+
+    function openModal() {
+      modal.classList.remove('hidden');
+      urlInput.value = '';
+      nameInput.value = '';
+      selectedIcon = 'fa-globe';
+      renderIconGrid();
+      urlInput.focus();
+    }
+
+    function closeModalFn() {
+      modal.classList.add('hidden');
+    }
+
+    addBtn.addEventListener('click', openModal);
+    closeModal.addEventListener('click', closeModalFn);
+    cancelBtn.addEventListener('click', closeModalFn);
+    modalOverlay.addEventListener('click', closeModalFn);
+
+    addForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const url = urlInput.value.trim();
+      const name = nameInput.value.trim();
+      if (!url || !name) return;
+
+      try {
+        const newLink = await addLink({ url, name, icon: selectedIcon });
+        links.push(newLink);
+        render();
+        closeModalFn();
+      } catch (err) {
+        alert('Failed to add link');
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModalFn();
+    });
+
+    // Init
+    initTheme();
+    renderIconGrid();
+    fetchLinks();
+  </script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+services:
+  homeindex:
+    build:
+      context: https://github.com/Zhujingxi/url-Index.git#main
+    container_name: homeindex
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped

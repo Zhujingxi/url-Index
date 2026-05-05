@@ -21,18 +21,37 @@ A simple, no-auth web app for quickly accessing and managing all your local netw
 - **Frontend:** Vanilla HTML/JS + Tailwind CSS (CDN) + Font Awesome (CDN)
 - **Container:** Docker / Docker Compose
 
-## Quick Start (Docker Compose)
+## Quick Start
+
+### Option 1: Single YAML file (no clone needed)
+
+Save the following as `compose.yml` and run:
 
 ```bash
-# Clone the repo
+docker compose up -d
+```
+
+```yaml
+services:
+  homeindex:
+    build:
+      context: https://github.com/Zhujingxi/url-Index.git#main
+    container_name: homeindex
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+```
+
+This automatically pulls the source from GitHub, builds the image, and starts the container.
+
+### Option 2: Clone first
+
+```bash
 git clone https://github.com/Zhujingxi/url-Index.git
 cd url-Index
-
-# Start the container
 docker compose up -d
-
-# Open in browser
-http://localhost:3000
 ```
 
 Links are stored in `./data/links.json` on your host machine.
